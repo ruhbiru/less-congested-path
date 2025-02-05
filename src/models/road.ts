@@ -14,6 +14,8 @@ export class Road {
   }
 
   getDistance(): number {
+    // we add 1 here as default distance/congestionValue,
+    // since may get congestionValue=0
     return this.congestionValue + 1;
   }
 

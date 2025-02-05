@@ -1,5 +1,7 @@
 import { Road } from "./models/road";
+import { GraphInfo } from "./types/graph-info";
 import { RoadDict } from "./types/road-dict";
+import { RoadGraph } from "./types/road-graph";
 
 const setAdjacentRoads = (road1: Road, road2: Road) => {
   road1.adjacentRoads.push(road2);
@@ -43,13 +45,6 @@ export const initRoadDict = () => {
   return roads;
 };
 
-type RoadGraph = { [roadName: string]: GraphInfo };
-type GraphInfo = {
-  road?: Road;
-  distance: number;
-  next?: Road | null;
-  isVisited?: boolean;
-};
 const initRoadGraph = (roads: RoadDict) => {
   const graph: RoadGraph = {};
   const roadNames = Object.keys(roads);
@@ -83,16 +78,12 @@ const getPath = (
 ) => {
   let currentGraphNodeInfo: GraphInfo | null = graph[departureRoad.name];
   const path = [];
+
   do {
     path.push(currentGraphNodeInfo.road!.name);
+    currentGraphNodeInfo = graph[currentGraphNodeInfo.next!.name];
+  } while (currentGraphNodeInfo.road!.name != destinationRoadName);
 
-    currentGraphNodeInfo = currentGraphNodeInfo.next
-      ? graph[currentGraphNodeInfo.next!.name]
-      : null;
-  } while (
-    currentGraphNodeInfo &&
-    currentGraphNodeInfo.road!.name != destinationRoadName
-  );
   path.push(destinationRoadName);
   return path;
 };
