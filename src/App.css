@@ -1,0 +1,39 @@
+.App {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+
+  width: 100%;
+  height: 100%;
+}
+
+.App-content {
+  display: flex;
+  flex-direction: row;
+
+  width: 100%;
+  margin: 1rem;
+
+  border-radius: 2px;
+  background-color: #fff;
+
+  /* This and other shadows are based on https://codepen.io/sdthornton/pen/wBZdXq */
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
+}
+
+.road-item-container,
+.road-input {
+  display: flex;
+  justify-content: space-between;
+  align-items: left;
+  width: 450px;
+  height: 30px;
+}
+
+.search-container {
+  display: flex;
+  flex-direction: column;
+  align-items: left;
+  width: 450px;
+  height: 30px;
+}
