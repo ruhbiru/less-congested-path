@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites name="jest tests" tests="8" failures="0" errors="0" time="0.91">
+  <testsuite name="src/roads/models/road.test.ts" errors="0" failures="0" skipped="0" timestamp="2025-02-06T08:13:42" time="0.293" tests="4">
+    <testcase classname="Road" name="Add vehicles correctly" time="0.001">
+    </testcase>
+    <testcase classname="Road" name="Delete vehicles correctly" time="0.001">
+    </testcase>
+    <testcase classname="Road" name="Get congestion value with no vehicles" time="0">
+    </testcase>
+    <testcase classname="Road" name="Get congestion value with vehicles" time="0">
+    </testcase>
+  </testsuite>
+  <testsuite name="src/roads/SearchLessCongestedPath.test.tsx" errors="0" failures="0" skipped="0" timestamp="2025-02-06T08:13:42" time="0.435" tests="2">
+    <testcase classname="SearchLessCongestedPath" name="Search when there&apos;s no traffic correctly" time="0.035">
+    </testcase>
+    <testcase classname="SearchLessCongestedPath" name="Search when there are 3 buses on &apos;NE 39th St&apos; road correctly" time="0.008">
+    </testcase>
+  </testsuite>
+  <testsuite name="src/roads/RoadList.test.tsx" errors="0" failures="0" skipped="0" timestamp="2025-02-06T08:13:42" time="0.465" tests="2">
+    <testcase classname="RoadList" name="Add vehicle on the road correctly" time="0.053">
+    </testcase>
+    <testcase classname="RoadList" name="Delete vehicle on the road correctly" time="0.02">
+    </testcase>
+  </testsuite>
+</testsuites>

@@ -1,8 +1,8 @@
 import { Road } from "../models/road";
 
-export type GraphInfo = {
+export type RoadNode = {
   road?: Road;
-  distance: number;
+  totalCongestionValue: number;
   next?: Road | null;
   isVisited?: boolean;
 };

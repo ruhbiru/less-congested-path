@@ -2,21 +2,21 @@ import { Vehicle } from "../types/vehicle.type";
 
 export class Road {
   name!: string;
-  congestionValue!: number;
+  private congestionValue!: number;
   vehicles!: { bike: number; car: number; bus: number };
   adjacentRoads!: Road[];
 
   constructor(name: string) {
     this.name = name;
-    this.congestionValue = 0;
+
+    // default congestion value = 1
+    this.congestionValue = 1;
     this.vehicles = { bike: 0, car: 0, bus: 0 };
     this.adjacentRoads = [];
   }
 
-  getDistance(): number {
-    // we add 1 here as default distance/congestionValue,
-    // since may get congestionValue=0
-    return this.congestionValue + 1;
+  getCongestionValue(): number {
+    return this.congestionValue;
   }
 
   addVehicle(vehicle: Vehicle): void {

@@ -1,18 +1,7 @@
-import { Road } from "./models/road";
-import { GraphInfo } from "./types/graph-info";
-import { RoadDict } from "./types/road-dict";
-import { RoadGraph } from "./types/road-graph";
-
-const setAdjacentRoads = (road1: Road, road2: Road) => {
-  road1.adjacentRoads.push(road2);
-  road2.adjacentRoads.push(road1);
-};
-
-const addNewRoad = (roads: RoadDict, name: string) => {
-  const road = new Road(name);
-  roads[name] = road;
-  return road;
-};
+import { Road } from "./roads/models/road";
+import { RoadNode } from "./roads/types/road-node";
+import { RoadDict } from "./roads/types/road-dict";
+import { RoadGraph } from "./roads/types/road-graph";
 
 export const initRoadDict = () => {
   const roads: RoadDict = {};
@@ -45,6 +34,59 @@ export const initRoadDict = () => {
   return roads;
 };
 
+const setAdjacentRoads = (road1: Road, road2: Road) => {
+  road1.adjacentRoads.push(road2);
+  road2.adjacentRoads.push(road1);
+};
+
+const addNewRoad = (roads: RoadDict, name: string) => {
+  const road = new Road(name);
+  roads[name] = road;
+  return road;
+};
+
+/**
+ * Search less congested path
+ * Traverse the less congested path from the destination to the departure point.
+ * Using Dijkstra's algorithm, calculate the congestion value for each road.
+ * Keep track of the next path leading to the next RoadNode.
+ */
+export const getLessCongestedPath = (
+  roads: RoadDict,
+  departureRoad: Road,
+  destinationRoad: Road
+) => {
+  const graph: RoadGraph = initRoadGraph(roads);
+
+  let roadBeingVisited: RoadNode | null = graph[destinationRoad.name];
+  roadBeingVisited.totalCongestionValue = 0;
+
+  let totalUnvisitedRoads = Object.keys(roads).length;
+
+  while (roadBeingVisited && totalUnvisitedRoads) {
+    for (let adjacentRoad of roadBeingVisited.road!.adjacentRoads) {
+      const adjacentRoadNode = graph[adjacentRoad.name];
+      if (!adjacentRoadNode.isVisited) {
+        const newTotalCongestionValue =
+          roadBeingVisited.totalCongestionValue +
+          adjacentRoad.getCongestionValue();
+
+        if (adjacentRoadNode.totalCongestionValue > newTotalCongestionValue) {
+          adjacentRoadNode.totalCongestionValue = newTotalCongestionValue;
+          adjacentRoadNode.next = roadBeingVisited.road;
+        }
+      }
+    }
+
+    graph[roadBeingVisited.road!.name].isVisited = true;
+    roadBeingVisited = getUnvisitedRoadWithLessCongestionValue(graph);
+
+    totalUnvisitedRoads--;
+  }
+
+  return getPath(graph, departureRoad, destinationRoad.name);
+};
+
 const initRoadGraph = (roads: RoadDict) => {
   const graph: RoadGraph = {};
   const roadNames = Object.keys(roads);
@@ -52,7 +94,7 @@ const initRoadGraph = (roads: RoadDict) => {
   for (let roadName of roadNames) {
     graph[roadName] = {
       road: roads[roadName],
-      distance: Infinity,
+      totalCongestionValue: Infinity,
       next: null,
       isVisited: false,
     };
@@ -60,15 +102,22 @@ const initRoadGraph = (roads: RoadDict) => {
   return graph;
 };
 
-const getUnvisitedRoadWithMinDistance = (graph: RoadGraph) => {
-  let lessDistance: GraphInfo = { distance: Infinity };
-  for (let graphInfo of Object.values(graph)) {
-    if (!graphInfo.isVisited && lessDistance.distance > graphInfo.distance) {
-      lessDistance = graphInfo;
+const getUnvisitedRoadWithLessCongestionValue = (graph: RoadGraph) => {
+  let roadWithLessCongestionValue: RoadNode = {
+    totalCongestionValue: Infinity,
+  };
+
+  for (let road of Object.values(graph)) {
+    if (
+      !road.isVisited &&
+      roadWithLessCongestionValue.totalCongestionValue >
+        road.totalCongestionValue
+    ) {
+      roadWithLessCongestionValue = road;
     }
   }
 
-  return lessDistance.road ? lessDistance : null;
+  return roadWithLessCongestionValue.road ? roadWithLessCongestionValue : null;
 };
 
 const getPath = (
@@ -76,55 +125,14 @@ const getPath = (
   departureRoad: Road,
   destinationRoadName: string
 ) => {
-  let currentGraphNodeInfo: GraphInfo | null = graph[departureRoad.name];
+  let currentRoad: RoadNode | null = graph[departureRoad.name];
   const path = [];
 
   do {
-    path.push(currentGraphNodeInfo.road!.name);
-    currentGraphNodeInfo = graph[currentGraphNodeInfo.next!.name];
-  } while (currentGraphNodeInfo.road!.name != destinationRoadName);
+    path.push(currentRoad.road!.name);
+    currentRoad = graph[currentRoad.next!.name];
+  } while (currentRoad.road!.name !== destinationRoadName);
 
   path.push(destinationRoadName);
   return path;
-};
-
-export const getLessCongestedPath = (
-  roads: RoadDict,
-  departureRoad: Road,
-  destinationRoad: Road
-) => {
-  const totalRoads = Object.keys(roads).length;
-  const graph: RoadGraph = initRoadGraph(roads);
-
-  let currentNode = destinationRoad;
-
-  let totalVisitedRoads = 0;
-  let currentGraphNodeInfo: GraphInfo = graph[currentNode.name];
-  currentGraphNodeInfo.distance = 0;
-
-  while (totalVisitedRoads < totalRoads) {
-    for (let adjacentRoad of currentNode.adjacentRoads) {
-      const adjacentRoadInfo = graph[adjacentRoad.name];
-      if (!adjacentRoadInfo.isVisited) {
-        const distance =
-          currentGraphNodeInfo.distance + adjacentRoad.getDistance();
-
-        if (adjacentRoadInfo.distance > distance) {
-          adjacentRoadInfo.distance = distance;
-          adjacentRoadInfo.next = currentNode;
-        }
-      }
-    }
-
-    graph[currentNode.name].isVisited = true;
-    totalVisitedRoads++;
-
-    const unvisitedRoad = getUnvisitedRoadWithMinDistance(graph);
-    if (unvisitedRoad) {
-      currentNode = unvisitedRoad.road!;
-      currentGraphNodeInfo = graph[currentNode.name];
-    }
-  }
-
-  return getPath(graph, departureRoad, destinationRoad.name);
 };
